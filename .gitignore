@@ -1,0 +1,10 @@
+.DS_Store
+
+.build/
+.build-release/
+
+UserScripts.app/
+
+output/
+
+.vscode/
