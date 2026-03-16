@@ -63,6 +63,36 @@ This generates:
 - a universal executable containing both `arm64` and `x86_64`
 - an `.icns` app icon generated from `assets/icon/userscripts-icon.svg`
 
+### Build a DMG package
+
+```bash
+./build-dmg.sh
+```
+
+This generates:
+
+- `output/release/UserScripts.dmg`
+- `output/release/UserScripts.dmg.sha256`
+
+## GitHub Release Automation
+
+This repository includes a GitHub Actions workflow at `.github/workflows/release.yml`.
+
+On every pushed tag matching `v*`, the workflow will:
+
+1. Build the universal macOS app bundle
+2. Package the app into a DMG
+3. Generate a SHA256 checksum file
+4. Upload build artifacts
+5. Create a GitHub Release with generated notes
+
+Example release tag:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
 ## Product Notes
 
 - The app is menu bar first, with a larger console window for detailed management

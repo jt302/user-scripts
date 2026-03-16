@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show Swift version
+        run: swift --version
+
+      - name: Make build scripts executable
+        run: chmod +x build-release.sh build-dmg.sh
+
+      - name: Build universal app bundle
+        run: ./build-release.sh
+
+      - name: Build DMG package
+        run: ./build-dmg.sh
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: userscripts-release-artifacts
+          path: |
+            UserScripts.app
+            output/release/UserScripts.dmg
+            output/release/UserScripts.dmg.sha256
+          if-no-files-found: error
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG_NAME" \
+            output/release/UserScripts.dmg \
+            output/release/UserScripts.dmg.sha256 \
+            --title "$TAG_NAME" \
+            --generate-notes
